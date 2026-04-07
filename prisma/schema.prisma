@@ -14,10 +14,10 @@ model User {
   image         String?
   password      String?
   role          String    @default("operator")
-  accounts      Account[]
-  sessions      Session[]
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
 }
 
 model Account {
@@ -55,48 +55,47 @@ model VerificationToken {
 }
 
 model Event {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   date        DateTime
   location    String
   description String?
   imageUrl    String?
-  ticketGoal  Int      @default(0)
-  initialCash Float    @default(0)
-  status      String   @default("planning")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  ticketTypes  TicketType[]
-  guests       Guest[]
-  promoters    Promoter[]
-  barItems     BarItem[]
-  barSales     BarSale[]
-  expenses     Expense[]
-  ticketSales  TicketSale[]
-  stockItems   StockItem[]
+  ticketGoal  Int          @default(0)
+  initialCash Float        @default(0)
+  status      String       @default("planning")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  barItems    BarItem[]
+  barSales    BarSale[]
+  expenses    Expense[]
+  guests      Guest[]
+  promoters   Promoter[]
+  stockItems  StockItem[]
+  ticketSales TicketSale[]
+  ticketTypes TicketType[]
 }
 
 model TicketType {
-  id      String @id @default(cuid())
+  id      String        @id @default(cuid())
   eventId String
   name    String
-  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
   batches TicketBatch[]
   sales   TicketSale[]
+  event   Event         @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model TicketBatch {
-  id           String     @id @default(cuid())
+  id           String       @id @default(cuid())
   ticketTypeId String
   name         String
   price        Float
   quantity     Int
-  sold         Int        @default(0)
-  status       String     @default("active")
-  startDate    DateTime?
+  sold         Int          @default(0)
+  status       String       @default("active")
   endDate      DateTime?
-  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+  startDate    DateTime?
+  ticketType   TicketType   @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
   sales        TicketSale[]
 }
 
@@ -111,10 +110,10 @@ model TicketSale {
   channel      String
   promoterId   String?
   saleDate     DateTime    @default(now())
-  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  ticketType   TicketType  @relation(fields: [ticketTypeId], references: [id])
-  batch        TicketBatch @relation(fields: [batchId], references: [id])
   promoter     Promoter?   @relation(fields: [promoterId], references: [id])
+  batch        TicketBatch @relation(fields: [batchId], references: [id])
+  ticketType   TicketType  @relation(fields: [ticketTypeId], references: [id])
+  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Guest {
@@ -124,21 +123,21 @@ model Guest {
   email     String?
   phone     String?
   status    String   @default("pending")
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Promoter {
-  id             String     @id @default(cuid())
+  id             String       @id @default(cuid())
   eventId        String
   name           String
   commission     Float
-  discountAmount Float      @default(0)
-  discountType   String     @default("fixed")
-  uniqueLink     String     @default("")
-  event          Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  discountAmount Float        @default(0)
+  discountType   String       @default("fixed")
+  uniqueLink     String       @default("")
+  createdAt      DateTime     @default(now())
+  event          Event        @relation(fields: [eventId], references: [id], onDelete: Cascade)
   sales          TicketSale[]
-  createdAt      DateTime   @default(now())
 }
 
 model BarItem {
@@ -158,8 +157,8 @@ model BarSale {
   quantity   Int
   totalValue Float
   saleTime   DateTime @default(now())
-  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   barItem    BarItem  @relation(fields: [barItemId], references: [id])
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Expense {
@@ -181,7 +180,7 @@ model StockItem {
   unit      String   @default("un")
   category  String   @default("outros")
   notes     String?
-  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }

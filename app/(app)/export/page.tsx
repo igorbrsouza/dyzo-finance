@@ -285,7 +285,7 @@ async function generatePdf(
     { label: "Caixa Inicial",                value: formatCurrency(f.initialCash),     valueColor: C.green },
     { label: "Receita Bruta Total",          value: formatCurrency(f.totalRevenue),    valueColor: C.green },
     { label: "Disponível no Caixa",          value: formatCurrency(f.availableNow),    valueColor: C.green },
-    { label: "Retido pela Plataforma (30%)", value: formatCurrency(f.platformRetained),valueColor: C.orange },
+    { label: "Retido pela Plataforma (30%)", value: formatCurrency(f.platformRetained), valueColor: C.orange },
     { label: "Despesas Pagas",               value: formatCurrency(f.paidExpenses),    valueColor: C.red },
     {
       label: "Saldo Real",
