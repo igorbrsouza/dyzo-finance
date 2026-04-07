@@ -51,12 +51,12 @@ export async function GET(req: NextRequest) {
 
   // Despesas
   const totalExpenses = expenses.reduce((sum, e) => sum + e.value, 0);
-  const paidExpenses = expenses
-    .filter((e) => e.status === "paid")
-    .reduce((sum, e) => sum + e.value, 0);
-  const pendingExpenses = expenses
-    .filter((e) => e.status !== "paid")
-    .reduce((sum, e) => sum + e.value, 0);
+  const paidExpenses =
+    expenses.filter((e) => e.status === "paid").reduce((sum, e) => sum + e.value, 0) +
+    expenses.filter((e) => e.status === "partial").reduce((sum, e) => sum + e.paidAmount, 0);
+  const pendingExpenses =
+    expenses.filter((e) => e.status === "pending").reduce((sum, e) => sum + e.value, 0) +
+    expenses.filter((e) => e.status === "partial").reduce((sum, e) => sum + (e.value - e.paidAmount), 0);
 
   // Saldo real
   const realBalance = availableNow - paidExpenses;
