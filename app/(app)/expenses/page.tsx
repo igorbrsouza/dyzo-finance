@@ -261,7 +261,7 @@ export default function ExpensesPage() {
               </div>
               <div className="space-y-1.5">
                 <Label>Status</Label>
-                <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+                <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v, paidAmount: v === "partial" ? form.paidAmount : "" })}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="paid">Pago</SelectItem>

@@ -40,7 +40,7 @@ export async function PUT(
     where: { id: params.id },
     data: {
       name: body.name,
-      date: new Date(body.date),
+      date: new Date(body.date + "T12:00:00"),
       location: body.location,
       description: body.description,
       imageUrl: body.imageUrl || null,
