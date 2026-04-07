@@ -1,0 +1,187 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("operator")
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  name        String
+  date        DateTime
+  location    String
+  description String?
+  imageUrl    String?
+  ticketGoal  Int      @default(0)
+  initialCash Float    @default(0)
+  status      String   @default("planning")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ticketTypes  TicketType[]
+  guests       Guest[]
+  promoters    Promoter[]
+  barItems     BarItem[]
+  barSales     BarSale[]
+  expenses     Expense[]
+  ticketSales  TicketSale[]
+  stockItems   StockItem[]
+}
+
+model TicketType {
+  id      String @id @default(cuid())
+  eventId String
+  name    String
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  batches TicketBatch[]
+  sales   TicketSale[]
+}
+
+model TicketBatch {
+  id           String     @id @default(cuid())
+  ticketTypeId String
+  name         String
+  price        Float
+  quantity     Int
+  sold         Int        @default(0)
+  status       String     @default("active")
+  startDate    DateTime?
+  endDate      DateTime?
+  ticketType   TicketType @relation(fields: [ticketTypeId], references: [id], onDelete: Cascade)
+  sales        TicketSale[]
+}
+
+model TicketSale {
+  id           String      @id @default(cuid())
+  eventId      String
+  ticketTypeId String
+  batchId      String
+  quantity     Int
+  unitPrice    Float
+  totalValue   Float
+  channel      String
+  promoterId   String?
+  saleDate     DateTime    @default(now())
+  event        Event       @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  ticketType   TicketType  @relation(fields: [ticketTypeId], references: [id])
+  batch        TicketBatch @relation(fields: [batchId], references: [id])
+  promoter     Promoter?   @relation(fields: [promoterId], references: [id])
+}
+
+model Guest {
+  id        String   @id @default(cuid())
+  eventId   String
+  name      String
+  email     String?
+  phone     String?
+  status    String   @default("pending")
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Promoter {
+  id             String     @id @default(cuid())
+  eventId        String
+  name           String
+  commission     Float
+  discountAmount Float      @default(0)
+  discountType   String     @default("fixed")
+  uniqueLink     String     @default("")
+  event          Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sales          TicketSale[]
+  createdAt      DateTime   @default(now())
+}
+
+model BarItem {
+  id      String    @id @default(cuid())
+  eventId String
+  name    String
+  price   Float
+  cost    Float?
+  event   Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  sales   BarSale[]
+}
+
+model BarSale {
+  id         String   @id @default(cuid())
+  eventId    String
+  barItemId  String
+  quantity   Int
+  totalValue Float
+  saleTime   DateTime @default(now())
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  barItem    BarItem  @relation(fields: [barItemId], references: [id])
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  eventId     String
+  description String
+  category    String
+  value       Float
+  status      String   @default("pending")
+  date        DateTime @default(now())
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model StockItem {
+  id        String   @id @default(cuid())
+  eventId   String
+  name      String
+  quantity  Float
+  unit      String   @default("un")
+  category  String   @default("outros")
+  notes     String?
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
