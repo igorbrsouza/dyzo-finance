@@ -1,11 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
-const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
 const bcrypt = require("bcryptjs");
-const path = require("path");
 
-const dbPath = path.resolve(process.cwd(), "dev.db");
-const adapter = new PrismaBetterSqlite3({ url: `file:${dbPath}` });
-const prisma = new PrismaClient({ adapter });
+const prisma = new PrismaClient();
 
 async function main() {
   const userCount = await prisma.user.count();

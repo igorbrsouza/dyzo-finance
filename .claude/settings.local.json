@@ -10,7 +10,10 @@
       "Bash(sqlite3:*)",
       "Bash(git add:*)",
       "Bash(git -c user.email=\"dev@nightcontrol.com\" -c user.name=\"NightControl\" commit -m \"feat: persist initialCash on event create and update\")",
-      "Bash(git:*)"
+      "Bash(git:*)",
+      "Bash(gh repo:*)",
+      "Bash(cmd:*)",
+      "Bash(echo \"Exit: $?\")"
     ]
   }
 }
