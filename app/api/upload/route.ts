@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -13,20 +18,24 @@ export async function POST(req: NextRequest) {
 
   if (!file) return NextResponse.json({ error: "Arquivo não enviado" }, { status: 400 });
 
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
-
   const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
   const allowedExts = ["jpg", "jpeg", "png", "webp", "gif"];
   if (!allowedExts.includes(ext)) {
     return NextResponse.json({ error: "Formato não suportado" }, { status: 400 });
   }
 
-  const filename = `event-${Date.now()}.${ext}`;
-  const uploadsDir = path.join(process.cwd(), "public", "uploads");
+  const bytes = await file.arrayBuffer();
+  const buffer = Buffer.from(bytes);
 
-  await mkdir(uploadsDir, { recursive: true });
-  await writeFile(path.join(uploadsDir, filename), buffer);
+  const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { folder: "dyzo-finance", resource_type: "image" },
+      (error, result) => {
+        if (error || !result) reject(error);
+        else resolve(result as { secure_url: string });
+      }
+    ).end(buffer);
+  });
 
-  return NextResponse.json({ url: `/uploads/${filename}` });
+  return NextResponse.json({ url: result.secure_url });
 }
