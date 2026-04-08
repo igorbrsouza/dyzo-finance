@@ -102,9 +102,6 @@ export default function LoginPage() {
           </form>
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
-          Use <span className="font-mono text-green-500">admin@nightcontrol.com</span> / <span className="font-mono text-green-500">admin123</span>
-        </p>
       </div>
     </div>
   );
