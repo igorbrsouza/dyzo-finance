@@ -23,4 +23,4 @@ COPY --from=builder /app/prisma.config.ts ./
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/public ./public
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma db push && node scripts/init-db.js && next start"]
+CMD ["sh", "-c", "npx prisma db push && node scripts/init-db.js && next start -p ${PORT:-3000}"]
