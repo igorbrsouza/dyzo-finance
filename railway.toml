@@ -3,4 +3,4 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "npx prisma db push && node scripts/init-db.js && next start -p ${PORT:-3000}"
+startCommand = "echo '=== DB push ===' && npx prisma db push && echo '=== Init DB ===' && node scripts/init-db.js && echo '=== Starting app ===' && next start -p ${PORT:-3000}"
