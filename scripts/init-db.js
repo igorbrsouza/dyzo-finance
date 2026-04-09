@@ -1,46 +1,34 @@
-const { PrismaClient } = require("@prisma/client");
 const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
+const { randomUUID } = require("crypto");
 
 async function main() {
-  const { PrismaPg } = await import("@prisma/adapter-pg");
-
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-  const adapter = new PrismaPg(pool);
-  const prisma = new PrismaClient({ adapter });
 
   try {
-    const userCount = await prisma.user.count();
-    if (userCount > 0) {
+    const { rows } = await pool.query('SELECT COUNT(*) AS count FROM "User"');
+    if (parseInt(rows[0].count) > 0) {
       console.log("Database already initialized, skipping seed.");
       return;
     }
 
     console.log("Initializing database...");
+    const now = new Date().toISOString();
 
     const adminPassword = await bcrypt.hash("admin123", 10);
-    await prisma.user.create({
-      data: {
-        name: "Admin",
-        email: "admin@nightcontrol.com",
-        password: adminPassword,
-        role: "admin",
-      },
-    });
+    await pool.query(
+      `INSERT INTO "User" (id, name, email, password, role, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [randomUUID(), "Admin", "admin@nightcontrol.com", adminPassword, "admin", now, now]
+    );
 
     const opPassword = await bcrypt.hash("op123", 10);
-    await prisma.user.create({
-      data: {
-        name: "Operador",
-        email: "operador@nightcontrol.com",
-        password: opPassword,
-        role: "operator",
-      },
-    });
+    await pool.query(
+      `INSERT INTO "User" (id, name, email, password, role, "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [randomUUID(), "Operador", "operador@nightcontrol.com", opPassword, "operator", now, now]
+    );
 
     console.log("Users created successfully.");
   } finally {
-    await prisma.$disconnect();
     await pool.end();
   }
 }
